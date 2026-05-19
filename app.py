@@ -493,72 +493,72 @@ def init_state(samples: list[SignalSample]) -> None:
         ]
 
 
-def render_sidebar() -> None:
-    with st.sidebar:
+# def render_sidebar() -> None:
+#     with st.sidebar:
 
-        st.markdown("# RAG Communication Assistant")
+#         st.markdown("# RAG Communication Assistant")
 
-        st.markdown(
-            """
-            <div class='small-muted'>
-            Hybrid FAISS + BM25 retrieval using
-            <code>pdf_chat.py</code>.
-            </div>
-            """,
-            unsafe_allow_html=True,
-        )
+#         st.markdown(
+#             """
+#             <div class='small-muted'>
+#             Hybrid FAISS + BM25 retrieval using
+#             <code>pdf_chat.py</code>.
+#             </div>
+#             """,
+#             unsafe_allow_html=True,
+#         )
 
-        st.divider()
+#         st.divider()
 
-        # CHAT HISTORY
-        for role, message in st.session_state.assistant_history:
+#         # CHAT HISTORY
+#         for role, message in st.session_state.assistant_history:
 
-            with st.chat_message(role):
+#             with st.chat_message(role):
 
-                st.markdown(message)
+#                 st.markdown(message)
 
-        # CHAT INPUT
-        prompt = st.chat_input(
-            "Ask about AMR, SNR, RadioML..."
-        )
+#         # CHAT INPUT
+#         prompt = st.chat_input(
+#             "Ask about AMR, SNR, RadioML..."
+#         )
 
-        if prompt:
+#         if prompt:
 
-            # USER MESSAGE
-            st.session_state.assistant_history.append(
-                ("user", prompt)
-            )
+#             # USER MESSAGE
+#             st.session_state.assistant_history.append(
+#                 ("user", prompt)
+#             )
 
-            with st.chat_message("user"):
-                st.markdown(prompt)
+#             with st.chat_message("user"):
+#                 st.markdown(prompt)
 
-            # ASSISTANT RESPONSE
-            with st.chat_message("assistant"):
+#             # ASSISTANT RESPONSE
+#             with st.chat_message("assistant"):
 
-                with st.spinner("Searching knowledge base..."):
+#                 with st.spinner("Searching knowledge base..."):
 
-                    try:
-                        answer = retrieve_answer(prompt)
+#                     try:
+#                         answer = retrieve_answer(prompt)
 
-                    except Exception as exc:
-                        answer = f"RAG backend error:\n\n{exc}"
+#                     except Exception as exc:
+#                         answer = f"RAG backend error:\n\n{exc}"
 
-                # STREAM EFFECT
-                response_placeholder = st.empty()
+#                 # STREAM EFFECT
+#                 response_placeholder = st.empty()
 
-                full_response = ""
+#                 full_response = ""
 
-                for word in answer.split():
+#                 for word in answer.split():
 
-                    full_response += word + " "
+#                     full_response += word + " "
 
-                    response_placeholder.markdown(full_response + "▌")
+#                     response_placeholder.markdown(full_response + "▌")
 
-                response_placeholder.markdown(full_response)
+#                 response_placeholder.markdown(full_response)
 
-            st.session_state.assistant_history.append(
-                ("assistant", answer)
-            )
+#             st.session_state.assistant_history.append(
+#                 ("assistant", answer)
+#             )
 
 
 def resolve_input(samples: list[SignalSample]) -> tuple[SignalSample, float]:
@@ -617,7 +617,7 @@ def main() -> None:
 
     samples = cached_samples()
     init_state(samples)
-    render_sidebar()
+    #render_sidebar()
 
     st.markdown(
         """
