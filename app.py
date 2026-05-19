@@ -11,22 +11,22 @@ import numpy as np
 import plotly.graph_objects as go
 import streamlit as st
 
-# from adaptive import recommend_modulation
-# from inference import (
-#     SignalSample,
-#     generate_synthetic_signal,
-#     load_amr_models,
-#     load_available_samples,
-#     normalize_signal,
-#     parse_signal_json,
-#     predict_modulation,
-# )
-# from model import MODULATION_CLASSES
-# from saliency import channel_importance, compute_saliency
+from adaptive import recommend_modulation
+from inference import (
+    SignalSample,
+    generate_synthetic_signal,
+    load_amr_models,
+    load_available_samples,
+    normalize_signal,
+    parse_signal_json,
+    predict_modulation,
+)
+from model import MODULATION_CLASSES
+from saliency import channel_importance, compute_saliency
 
 
 PAGE_TITLE = "Adaptive AMR Control System"
-# PDF_CHAT_PATH = Path(__file__).resolve().parent / "app" / "explainability" / "pdf_chat.py"
+PDF_CHAT_PATH = Path(__file__).resolve().parent / "app" / "explainability" / "pdf_chat.py"
 
 
 
@@ -612,167 +612,163 @@ def resolve_input(samples: list[SignalSample]) -> tuple[SignalSample, float]:
     return display_sample, float(target_snr)
 
 
-# def main() -> None:
-#     inject_css()
+def main() -> None:
+    inject_css()
 
-#     samples = cached_samples()
-#     init_state(samples)
-#     #render_sidebar()
+    samples = cached_samples()
+    init_state(samples)
+    #render_sidebar()
 
-#     st.markdown(
-#         """
-#         <section class="hero">
-#             <div class="hero-kicker">AI-powered wireless communication control system</div>
-#             <h1>Adaptive Automatic Modulation Recognition</h1>
-#             <p class="hero-sub">
-#                 CNN-GRU-GNN inference, SNR-aware model routing, adaptive modulation recommendation,
-#                 and gradient-based explainability for I/Q radio signals.
-#             </p>
-#         </section>
-#         """,
-#         unsafe_allow_html=True,
-#     )
+    st.markdown(
+        """
+        <section class="hero">
+            <div class="hero-kicker">AI-powered wireless communication control system</div>
+            <h1>Adaptive Automatic Modulation Recognition</h1>
+            <p class="hero-sub">
+                CNN-GRU-GNN inference, SNR-aware model routing, adaptive modulation recommendation,
+                and gradient-based explainability for I/Q radio signals.
+            </p>
+        </section>
+        """,
+        unsafe_allow_html=True,
+    )
 
-#     try:
-#         models, device, edge_index = cached_models()
-#         model_ready = True
-#         model_error = ""
-#     except Exception as exc:
-#         models, device, edge_index = None, None, None
-#         model_ready = False
-#         model_error = str(exc)
+    try:
+        models, device, edge_index = cached_models()
+        model_ready = True
+        model_error = ""
+    except Exception as exc:
+        models, device, edge_index = None, None, None
+        model_ready = False
+        model_error = str(exc)
 
-#     left, right = st.columns([0.9, 1.3], gap="large")
-#     with left:
-#         sample, snr = resolve_input(samples)
-#         recommendation = recommend_modulation(snr)
+    left, right = st.columns([0.9, 1.3], gap="large")
+    with left:
+        sample, snr = resolve_input(samples)
+        recommendation = recommend_modulation(snr)
 
-#         st.markdown("### System Status")
-#         status_cols = st.columns(2)
-#         with status_cols[0]:
-#             neon_card("Input SNR", f"{snr:g} dB", sample.source)
-#         with status_cols[1]:
-#             neon_card("True Label", sample.modulation, "Available for demo samples")
+        st.markdown("### System Status")
+        status_cols = st.columns(2)
+        with status_cols[0]:
+            neon_card("Input SNR", f"{snr:g} dB", sample.source)
+        with status_cols[1]:
+            neon_card("True Label", sample.modulation, "Available for demo samples")
 
-#         st.plotly_chart(plot_snr_meter(snr), use_container_width=True)
+        st.plotly_chart(plot_snr_meter(snr), use_container_width=True)
 
-#     with right:
-#         route_key = "high_snr" if snr >= 0 else "robust"
-#         route_name = "High-SNR Model" if route_key == "high_snr" else "Robust Fine-Tuned Model"
-#         st.markdown("### Model Routing")
-#         st.markdown(
-#             f"""
-#             <div class="glass-card">
-#                 <span class="badge"><span class="pulse-dot"></span>{route_name}</span>
-#                 <p class="small-muted" style="margin-top: 14px;">
-#                     {'Clean-channel specialist selected because SNR is at or above 0 dB.' if snr >= 0 else 'Noise-hardened model selected because SNR is below 0 dB.'}
-#                 </p>
-#             </div>
-#             """,
-#             unsafe_allow_html=True,
-#         )
+    with right:
+        route_key = "high_snr" if snr >= 0 else "robust"
+        route_name = "High-SNR Model" if route_key == "high_snr" else "Robust Fine-Tuned Model"
+        st.markdown("### Model Routing")
+        st.markdown(
+            f"""
+            <div class="glass-card">
+                <span class="badge"><span class="pulse-dot"></span>{route_name}</span>
+                <p class="small-muted" style="margin-top: 14px;">
+                    {'Clean-channel specialist selected because SNR is at or above 0 dB.' if snr >= 0 else 'Noise-hardened model selected because SNR is below 0 dB.'}
+                </p>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
-#         if not model_ready:
-#             st.error(model_error)
-#             st.stop()
+        if not model_ready:
+            st.error(model_error)
+            st.stop()
 
-#         result = predict_modulation(sample.signal, snr, models, device, edge_index)
-#         active_model = models[result.active_model_key]
-#         saliency, _ = compute_saliency(active_model, sample.signal, edge_index, device)
-#         importance = channel_importance(saliency)
+        result = predict_modulation(sample.signal, snr, models, device, edge_index)
+        active_model = models[result.active_model_key]
+        saliency, _ = compute_saliency(active_model, sample.signal, edge_index, device)
+        importance = channel_importance(saliency)
 
-#         p_col1, p_col2 = st.columns([0.95, 1.05], gap="large")
-#         with p_col1:
-#             st.markdown(
-#                 f"""
-#                 <div class="prediction">
-#                     <div class="metric-label">Predicted Modulation</div>
-#                     <div class="value">{result.predicted_modulation}</div>
-#                     <div class="metric-note">Confidence {result.confidence:.2%}</div>
-#                 </div>
-#                 """,
-#                 unsafe_allow_html=True,
-#             )
-#         with p_col2:
-#             rec_note = f"{recommendation['spectral_efficiency']:.1f} bits/s/Hz · {recommendation['profile']}"
-#             neon_card("Adaptive Recommendation", str(recommendation["modulation"]), rec_note)
-#             st.markdown(f"<div class='small-muted'>{recommendation['explanation']}</div>", unsafe_allow_html=True)
+        p_col1, p_col2 = st.columns([0.95, 1.05], gap="large")
+        with p_col1:
+            st.markdown(
+                f"""
+                <div class="prediction">
+                    <div class="metric-label">Predicted Modulation</div>
+                    <div class="value">{result.predicted_modulation}</div>
+                    <div class="metric-note">Confidence {result.confidence:.2%}</div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+        with p_col2:
+            rec_note = f"{recommendation['spectral_efficiency']:.1f} bits/s/Hz · {recommendation['profile']}"
+            neon_card("Adaptive Recommendation", str(recommendation["modulation"]), rec_note)
+            st.markdown(f"<div class='small-muted'>{recommendation['explanation']}</div>", unsafe_allow_html=True)
 
-#     tab_wave, tab_prediction, tab_xai, tab_status = st.tabs(
-#         ["Waveform Visualization", "Modulation Prediction", "Explainable AI", "System Status"]
-#     )
+    tab_wave, tab_prediction, tab_xai, tab_status = st.tabs(
+        ["Waveform Visualization", "Modulation Prediction", "Explainable AI", "System Status"]
+    )
 
-#     with tab_wave:
-#         c1, c2 = st.columns(2, gap="large")
-#         with c1:
-#             st.plotly_chart(plot_waveform(sample.signal, "I/Q Waveform"), use_container_width=True)
-#         with c2:
-#             st.plotly_chart(plot_constellation(sample.signal), use_container_width=True)
+    with tab_wave:
+        c1, c2 = st.columns(2, gap="large")
+        with c1:
+            st.plotly_chart(plot_waveform(sample.signal, "I/Q Waveform"), use_container_width=True)
+        with c2:
+            st.plotly_chart(plot_constellation(sample.signal), use_container_width=True)
 
-#     with tab_prediction:
-#         c1, c2 = st.columns([1.15, 0.85], gap="large")
-#         with c1:
-#             st.plotly_chart(plot_probabilities(result.probabilities), use_container_width=True)
-#         with c2:
-#             top3 = sorted(result.probabilities.items(), key=lambda item: item[1], reverse=True)[:3]
-#             st.markdown("### Top Classes")
-#             for rank, (name, prob) in enumerate(top3, start=1):
-#                 neon_card(f"Rank {rank}", name, f"{prob:.2%} posterior probability")
+    with tab_prediction:
+        c1, c2 = st.columns([1.15, 0.85], gap="large")
+        with c1:
+            st.plotly_chart(plot_probabilities(result.probabilities), use_container_width=True)
+        with c2:
+            top3 = sorted(result.probabilities.items(), key=lambda item: item[1], reverse=True)[:3]
+            st.markdown("### Top Classes")
+            for rank, (name, prob) in enumerate(top3, start=1):
+                neon_card(f"Rank {rank}", name, f"{prob:.2%} posterior probability")
 
-#     with tab_xai:
-#         x1, x2 = st.columns(2, gap="large")
-#         with x1:
-#             st.plotly_chart(plot_saliency_overlay(sample.signal, saliency, 0, "I", "#35e7ff"), use_container_width=True)
-#         with x2:
-#             st.plotly_chart(plot_saliency_overlay(sample.signal, saliency, 1, "Q", "#ff4fd8"), use_container_width=True)
+    with tab_xai:
+        x1, x2 = st.columns(2, gap="large")
+        with x1:
+            st.plotly_chart(plot_saliency_overlay(sample.signal, saliency, 0, "I", "#35e7ff"), use_container_width=True)
+        with x2:
+            st.plotly_chart(plot_saliency_overlay(sample.signal, saliency, 1, "Q", "#ff4fd8"), use_container_width=True)
 
-#         x3, x4 = st.columns([0.85, 1.15], gap="large")
-#         with x3:
-#             st.plotly_chart(plot_feature_importance(importance), use_container_width=True)
-#         with x4:
-#             st.markdown(
-#                 f"""
-#                 <div class="glass-card">
-#                     <div class="metric-label">Saliency Readout</div>
-#                     <div class="metric-value">{max(importance, key=importance.get)}</div>
-#                     <div class="metric-note">
-#                         The dominant channel contributed {max(importance.values()):.1%} of the normalized gradient energy.
-#                         Peaks in the overlays mark waveform regions with strongest influence on the predicted class logit.
-#                     </div>
-#                 </div>
-#                 """,
-#                 unsafe_allow_html=True,
-#             )
+        x3, x4 = st.columns([0.85, 1.15], gap="large")
+        with x3:
+            st.plotly_chart(plot_feature_importance(importance), use_container_width=True)
+        with x4:
+            st.markdown(
+                f"""
+                <div class="glass-card">
+                    <div class="metric-label">Saliency Readout</div>
+                    <div class="metric-value">{max(importance, key=importance.get)}</div>
+                    <div class="metric-note">
+                        The dominant channel contributed {max(importance.values()):.1%} of the normalized gradient energy.
+                        Peaks in the overlays mark waveform regions with strongest influence on the predicted class logit.
+                    </div>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
 
-#     with tab_status:
-#         s1, s2, s3, s4 = st.columns(4)
-#         with s1:
-#             neon_card("Processing Status", "Online", "CPU batch-size-1 inference")
-#         with s2:
-#             neon_card("Active Model", result.active_model_name, result.routing_message)
-#         with s3:
-#             neon_card("Confidence", f"{result.confidence:.2%}", "Softmax prediction confidence")
-#         with s4:
-#             neon_card("Classes", str(len(MODULATION_CLASSES)), "RadioML modulation labels")
+    with tab_status:
+        s1, s2, s3, s4 = st.columns(4)
+        with s1:
+            neon_card("Processing Status", "Online", "CPU batch-size-1 inference")
+        with s2:
+            neon_card("Active Model", result.active_model_name, result.routing_message)
+        with s3:
+            neon_card("Confidence", f"{result.confidence:.2%}", "Softmax prediction confidence")
+        with s4:
+            neon_card("Classes", str(len(MODULATION_CLASSES)), "RadioML modulation labels")
 
-#         st.markdown("### Deployment Checklist")
-#         st.markdown(
-#             """
-#             <div class="glass-card">
-#                 <div class="small-muted">
-#                     Root entry point: <code>app.py</code><br>
-#                     Model checkpoints: <code>models/best_model.pth</code>, <code>models/final_finetuned_model.pth</code><br>
-#                     Local command: <code>streamlit run app.py</code><br>
-#                     Cloud targets: Streamlit Cloud or HuggingFace Spaces using <code>requirements.txt</code>
-#                 </div>
-#             </div>
-#             """,
-#             unsafe_allow_html=True,
-#         )
-
-def main():
-    st.title("AMR Dashboard Running")
-    st.success("Deployment successful")
+        st.markdown("### Deployment Checklist")
+        st.markdown(
+            """
+            <div class="glass-card">
+                <div class="small-muted">
+                    Root entry point: <code>app.py</code><br>
+                    Model checkpoints: <code>models/best_model.pth</code>, <code>models/final_finetuned_model.pth</code><br>
+                    Local command: <code>streamlit run app.py</code><br>
+                    Cloud targets: Streamlit Cloud or HuggingFace Spaces using <code>requirements.txt</code>
+                </div>
+            </div>
+            """,
+            unsafe_allow_html=True,
+        )
 
 
 if __name__ == "__main__":
