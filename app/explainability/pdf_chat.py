@@ -73,7 +73,7 @@ TOP_K = int(os.getenv("AMR_TOP_K", "5"))
 INITIAL_RETRIEVAL_K = int(os.getenv("AMR_INITIAL_K", "12"))
 
 # RAG Provider
-RAG_PROVIDER = "ollama"
+RAG_PROVIDER = "api"
 
 # Ollama
 OLLAMA_URL = os.getenv(
