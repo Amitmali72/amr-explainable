@@ -346,6 +346,9 @@ This project is licensed under the **MIT License** — see the LICENSE file for 
 ## 👨‍💻 Author
 
 **Amit Mali** | [GitHub](https://github.com/Amitmali72) | [LinkedIn](https://linkedin.com/in/amitmali)
+**Pranav Karande**
+**Pratik Maruti Bhosale**
+**Shivraj Nalawade**
 
 ---
 
